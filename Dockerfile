@@ -1,13 +1,15 @@
-# Simple Dockerfile for terminal access
 FROM ubuntu:22.04
 
-# Install some basic tools
+# Install OpenSSH and utilities
 RUN apt-get update && apt-get install -y \
-    bash curl nano vim git net-tools iputils-ping \
+    openssh-server sudo curl vim git iputils-ping net-tools \
     && rm -rf /var/lib/apt/lists/*
 
-# Default working directory
-WORKDIR /root
+# Create a non-root user with sudo access
+RUN useradd -ms /bin/bash reef && echo "reef:reefpass" | chpasswd && adduser reef sudo
 
-# Keep the container running with bash
-CMD ["bash"]
+# Prepare SSH daemon
+RUN mkdir /var/run/sshd
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
