@@ -10,6 +10,6 @@ RUN useradd -ms /bin/bash reef && echo "reef:reefpass" | chpasswd && adduser ree
 
 # Prepare SSH daemon
 RUN mkdir /var/run/sshd
-EXPOSE 2222
+EXPOSE 22
 
 CMD ["/usr/sbin/sshd", "-D"]
