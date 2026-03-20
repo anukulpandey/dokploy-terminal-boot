@@ -2,22 +2,23 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install SSH
 RUN apt-get update && apt-get install -y \
-    openssh-server sudo curl git vim expect \
+    openssh-server sudo \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /run/sshd
+# Setup SSH
+RUN mkdir /var/run/sshd
 
+# Create user
 RUN useradd -m -s /bin/bash anukul && \
     echo "anukul:anukul" | chpasswd && \
     usermod -aG sudo anukul
 
-RUN sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config && \
-    sed -i 's/^#\?UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
-
-# 🔥 FIXED INSTALL
-RUN curl -fsSL https://openclaw.ai/install.sh | script -q -c "bash" /dev/null
+# Enable password login
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config || true && \
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
+    echo "PermitRootLogin no" >> /etc/ssh/sshd_config
 
 EXPOSE 22
 
